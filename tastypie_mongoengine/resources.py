@@ -437,25 +437,6 @@ class MongoEngineResource(resources.ModelResource):
             if getattr(bundle.obj, field_object.attribute, None) is None or value is None: # We also have to check value, read comment above
                 raise tastypie_exceptions.ApiFieldError("The '%s' field has no data and doesn't allow a default or null value." % field_object.instance_name)
 
-        # We validate MongoEngine object here so that possible exception
-        # is thrown before going to MongoEngine layer, wrapped in
-        # Django exception so that it is handled properly
-        # is_valid method is too early as bundle.obj is not yet ready then
-        try:
-            # Validation fails for unsaved related resources, so
-            # we fake pk here temporary, for validation code to
-            # assume resource is saved
-            pk = getattr(bundle.obj, 'pk', None)
-            try:
-                if pk is None:
-                    bundle.obj.pk = bson.ObjectId()
-                bundle.obj.validate()
-            finally:
-                if pk is None:
-                    bundle.obj.pk = pk
-        except mongoengine.ValidationError, e:
-            raise exceptions.ValidationError(e.message)
-
         return bundle
 
     def build_schema(self):
