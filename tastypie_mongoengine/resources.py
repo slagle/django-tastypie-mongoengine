@@ -432,11 +432,6 @@ class MongoEngineResource(resources.ModelResource):
             if field_object.blank or field_object.null:
                 continue
 
-            # We are just trying to fix Tastypie here, for other "null" values
-            # like [] and {} we leave to validate bellow to catch them
-            if getattr(bundle.obj, field_object.attribute, None) is None or value is None: # We also have to check value, read comment above
-                raise tastypie_exceptions.ApiFieldError("The '%s' field has no data and doesn't allow a default or null value." % field_object.instance_name)
-
         return bundle
 
     def build_schema(self):
